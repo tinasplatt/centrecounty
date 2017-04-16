@@ -5,10 +5,54 @@
     .mapboxgl-popup-content {
       max-width: 400px;
     }
+
+    #menu {
+        background: #fff;
+        position: absolute;
+        z-index: 1;
+        top: 10px;
+        right: 10px;
+        border-radius: 3px;
+        width: 120px;
+        border: 1px solid rgba(0,0,0,0.4);
+        font-family: 'Open Sans', sans-serif;
+    }
+
+    #menu a {
+        font-size: 13px;
+        color: #404040;
+        display: block;
+        margin: 0;
+        padding: 0;
+        padding: 10px;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(0,0,0,0.25);
+        text-align: center;
+    }
+
+    #menu a:last-child {
+        border: none;
+    }
+
+    #menu a:hover {
+        background-color: #f8f8f8;
+        color: #404040;
+    }
+
+    #menu a.active {
+        background-color: #3887be;
+        color: #ffffff;
+    }
+
+    #menu a.active:hover {
+        background: #3074a4;
+    }
   </style>
 </head>
 <body>
   <h1>Centre County Points of Interest</h1>
+  <nav id="menu"></nav>
+
   <div id='map' style='width: 900px; height: 600px;'></div>
   <script>
   mapboxgl.accessToken = 'pk.eyJ1IjoiY2VudHJlY291bnR5IiwiYSI6IjBFWVVnczgifQ.njqaUJ7PfP_-HQQV0cmV7g';
@@ -45,6 +89,21 @@
             "fill-opacity": 0.5,
             "fill-outline-color": "#000000"
         }
+    });
+    map.addLayer({
+        "id": "historic_districts_hover",
+        "type": "fill",
+        "source": {
+            type: 'vector',
+            url: 'mapbox://centrecounty.cj0m6llmt004f2wpe2pbpvvw8-8fs6s'
+        },
+        "source-layer": "Historic_Districts",
+        "layout": {},
+        "paint": {
+            "fill-color": "#23a523",
+            "fill-opacity": 1
+        },
+        "filter": ["==", "title", ""]
     });
     map.addLayer({
         "id": "markers",
@@ -127,11 +186,34 @@
         }
     });
 
-    map.on('click', 'historic_districts', function (e) {
-        new mapboxgl.Popup()
-            .setLngLat(e.lngLat)
+    var popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
+    });
+
+    map.on('mouseenter', 'historic_districts', function(e) {
+        // Change the cursor style as a UI indicator.
+        map.getCanvas().style.cursor = 'pointer';
+
+        // Populate the popup and set its coordinates
+        // based on the feature found.
+        popup.setLngLat(e.lngLat)
             .setHTML(e.features[0].properties.title)
             .addTo(map);
+    });
+
+    map.on('mouseleave', 'historic_districts', function() {
+        map.getCanvas().style.cursor = '';
+        popup.remove();
+    });
+
+    map.on("mousemove", "historic_districts"  , function(e) {
+        map.setFilter("historic_districts_hover", ["==", "title", e.features[0].properties.title]);
+    });
+
+    // Reset the state-fills-hover layer's filter when the mouse leaves the layer.
+    map.on("mouseleave", "historic_districts", function() {
+        map.setFilter("historic_districts_hover", ["==", "title", ""]);
     });
 
     var interactiveLayers = ['historic_sites', 'museums', 'points_of_interest', 'markers']
@@ -152,8 +234,32 @@
       map.on('mouseleave', layer, function () {
           map.getCanvas().style.cursor = '';
       });
-    }
 
-  });
+      var link = document.createElement('a');
+      link.href = '#';
+      link.className = 'active';
+      link.textContent = layer;
+
+      link.onclick = function (e) {
+          var clickedLayer = this.textContent;
+          e.preventDefault();
+          e.stopPropagation();
+
+          var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+
+          if (visibility === 'visible') {
+              map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+              this.className = '';
+          } else {
+              this.className = 'active';
+              map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+          }
+      };
+
+      var layers = document.getElementById('menu');
+      layers.appendChild(link);
+      }
+
+    });
   </script>
 </body>
