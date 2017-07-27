@@ -1,61 +1,4 @@
-<head>
-  <script src='https://api.mapbox.com/mapbox-gl-js/v0.35.1/mapbox-gl.js'></script>
-  <link href='https://api.mapbox.com/mapbox-gl-js/v0.35.1/mapbox-gl.css' rel='stylesheet' />
-  <style>
-    .mapboxgl-popup-content {
-      max-width: 400px;
-    }
-
-    #menu {
-        background: #fff;
-        position: absolute;
-        z-index: 1;
-        top: 10px;
-        right: 10px;
-        border-radius: 3px;
-        width: 120px;
-        border: 1px solid rgba(0,0,0,0.4);
-        font-family: 'Open Sans', sans-serif;
-    }
-
-    #menu a {
-        font-size: 13px;
-        color: #404040;
-        display: block;
-        margin: 0;
-        padding: 0;
-        padding: 10px;
-        text-decoration: none;
-        border-bottom: 1px solid rgba(0,0,0,0.25);
-        text-align: center;
-        text-transform: capitalize;
-    }
-
-    #menu a:last-child {
-        border: none;
-    }
-
-    #menu a:hover {
-        background-color: #f8f8f8;
-        color: #404040;
-    }
-
-    #menu a.active {
-        background-color: #3887be;
-        color: #ffffff;
-    }
-
-    #menu a.active:hover {
-        background: #3074a4;
-    }
-  </style>
-</head>
-<body>
-  <h1>Centre County Points of Interest</h1>
-  <nav id="menu"></nav>
-
-  <div id='map' style='width: 900px; height: 600px;'></div>
-  <script>
+function loadMap() {
   mapboxgl.accessToken = 'pk.eyJ1IjoiY2VudHJlY291bnR5IiwiYSI6IjBFWVVnczgifQ.njqaUJ7PfP_-HQQV0cmV7g';
   createPopupHTML = function(object){
     console.log(object);
@@ -262,5 +205,4 @@
       }
 
     });
-  </script>
-</body>
+}
